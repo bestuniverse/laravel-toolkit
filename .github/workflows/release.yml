@@ -1,0 +1,24 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - '*' # Spustí sa pre každý tag, ktorý začína na "v" (napr. v1.0.0, v2.1.0-beta)
+
+jobs:
+  build:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Vyžaduje sa pre zápis a vytvorenie Release
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true # Automaticky vygeneruje changelog z commitov/PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
