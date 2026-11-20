@@ -39,12 +39,15 @@ final class MysqlBackupCommandTest extends TestCase
             'password' => 'secret',
         ]);
         config()->set('laravel-toolkit.disk', 'local');
+        config()->set('app.env', 'staging');
         Storage::fake('local');
         Process::fake();
 
         $this->artisan('db:backup')->assertExitCode(0);
 
         Process::assertRan(static function ($process) use ($expected, $excluded): bool {
+            self::assertMatchesRegularExpression('/staging_\d{4}_\d{2}_\d{2}_\d{6}_full\.sql/', $process->command);
+
             foreach ($expected as $option) {
                 self::assertStringContainsString(escapeshellarg($option), $process->command);
             }

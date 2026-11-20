@@ -43,14 +43,14 @@ Create a MySQL backup using the application's `mysql` database connection:
 php artisan db:backup
 ```
 
-Backup files are written to the configured disk and directory, for example `storage/app/mysql-backup/live_2026_09_01_120000_full.sql` when using the local disk.
+Backup files are written to the configured disk and directory. The filename starts with `APP_ENV`. For example, `APP_ENV=production` on the local disk produces `storage/app/mysql-backup/production_2026_09_01_120000_full.sql`.
 
 ### Import a backup
 
 Import a specific SQL file from the configured backup directory:
 
 ```bash
-php artisan db:import live_2026_09_01_120000_full.sql
+php artisan db:import production_2026_09_01_120000_full.sql
 ```
 
 When no filename is supplied, the command interactively asks which `.sql` file to import:

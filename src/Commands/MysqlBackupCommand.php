@@ -48,11 +48,13 @@ final class MysqlBackupCommand extends Command
             return self::FAILURE;
         }
 
+        $prefix = $directory . '/' . config('app.env') . '_' . now()->format('Y_m_d_His');
+
         if($full) {
-            $fileName = ($directory . '/live_' . now()->format('Y_m_d_His') . '_full.sql');
+            $fileName = $prefix . '_full.sql';
             $tables = [];
         } else {
-            $fileName = ($directory . '/live_' . now()->format('Y_m_d_His') . '_partial.sql');
+            $fileName = $prefix . '_partial.sql';
         }
 
         // Uistíme sa, že adresár existuje
