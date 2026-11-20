@@ -38,6 +38,7 @@ final class MysqlBackupCommand extends Command
 
         $host = $conn['host'] ?? '127.0.0.1';
         $port = $conn['port'] ?? 3306;
+        $socket = $conn['unix_socket'] ?? '';
         $db = $conn['database'] ?? null;
         $user = $conn['username'] ?? null;
         $pass = $conn['password'] ?? '';
@@ -58,11 +59,19 @@ final class MysqlBackupCommand extends Command
         Storage::disk($disk)->makeDirectory(dirname($fileName));
         $fullPath = Storage::disk($disk)->path($fileName);
 
+        // Prefer an explicitly configured socket; otherwise keep localhost on IPv4.
+        $connectionOptions = $socket !== ''
+            ? ['--protocol=SOCKET', "--socket={$socket}"]
+            : [
+                '--protocol=TCP',
+                '--host=' . (strcasecmp($host, 'localhost') === 0 ? '127.0.0.1' : $host),
+                "--port={$port}",
+            ];
+
         // Vybuduj príkaz mysqldump
         $cmd = [
             'mysqldump',
-            "--host={$host}",
-            "--port={$port}",
+            ...$connectionOptions,
             "--user={$user}",
             "--password={$pass}",
             '--single-transaction',
