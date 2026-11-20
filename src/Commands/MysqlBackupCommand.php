@@ -61,14 +61,13 @@ final class MysqlBackupCommand extends Command
         Storage::disk($disk)->makeDirectory(dirname($fileName));
         $fullPath = Storage::disk($disk)->path($fileName);
 
-        // Prefer an explicitly configured socket; otherwise keep localhost on IPv4.
-        $connectionOptions = $socket !== ''
-            ? ['--protocol=SOCKET', "--socket={$socket}"]
-            : [
-                '--protocol=TCP',
-                '--host=' . (strcasecmp($host, 'localhost') === 0 ? '127.0.0.1' : $host),
-                "--port={$port}",
-            ];
+        if ($socket !== '') {
+            $connectionOptions = ['--protocol=SOCKET', "--socket={$socket}"];
+        } elseif (PHP_OS_FAMILY !== 'Windows' && $host === 'localhost') {
+            $connectionOptions = ['--protocol=SOCKET', '--host=localhost'];
+        } else {
+            $connectionOptions = ['--protocol=TCP', "--host={$host}", "--port={$port}"];
+        }
 
         // Vybuduj príkaz mysqldump
         $cmd = [

@@ -20,7 +20,10 @@ final class MysqlBackupCommandTest extends TestCase
     public static function connections(): array
     {
         return [
-            'localhost uses IPv4' => ['localhost', '', ['--protocol=TCP', '--host=127.0.0.1', '--port=3307'], ['--socket=']],
+            'localhost uses the platform default transport' => PHP_OS_FAMILY === 'Windows'
+                ? ['localhost', '', ['--protocol=TCP', '--host=localhost', '--port=3307'], ['--socket=']]
+                : ['localhost', '', ['--protocol=SOCKET', '--host=localhost'], ['--port=', '--protocol=TCP']],
+            'explicit loopback uses TCP' => ['127.0.0.1', '', ['--protocol=TCP', '--host=127.0.0.1', '--port=3307'], ['--socket=']],
             'remote host is preserved' => ['db.example.com', '', ['--protocol=TCP', '--host=db.example.com', '--port=3307'], ['--socket=']],
             'socket takes precedence' => ['localhost', '/run/mysqld/mysqld.sock', ['--protocol=SOCKET', '--socket=/run/mysqld/mysqld.sock'], ['--host=', '--port=']],
         ];
